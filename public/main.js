@@ -89,16 +89,10 @@ $(function () {
         return;
       }
 
-      // el.object3D.rotation.set(
-      //   THREE.Math.degToRad(data.rotation.x),
-      //   THREE.Math.degToRad(data.rotation.y),
-      //   THREE.Math.degToRad(data.rotation.z)
-      // );
-
       var test = {
-        x: THREE.Math.radToDeg(el.object3D.rotation.x),
-        y: THREE.Math.radToDeg(el.object3D.rotation.y),
-        z: THREE.Math.radToDeg(el.object3D.rotation.z)
+        x: window.THREE.Math.radToDeg(el.object3D.rotation.x),
+        y: window.THREE.Math.radToDeg(el.object3D.rotation.y),
+        z: window.THREE.Math.radToDeg(el.object3D.rotation.z)
       };
 
       window.anime({
@@ -116,7 +110,7 @@ $(function () {
         },
         update: function (anim) {
           // console.log('easing', test)
-          el.object3D.rotation.set(THREE.Math.degToRad(test.x), THREE.Math.degToRad(test.y), THREE.Math.degToRad(test.z));
+          el.object3D.rotation.set(window.THREE.Math.degToRad(test.x), window.THREE.Math.degToRad(test.y), window.THREE.Math.degToRad(test.z));
         },
         complete: function () {
           el.setAttribute("animating", "false");

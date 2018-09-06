@@ -85,29 +85,45 @@ $(function () {
 
   function setRotation(el, data) {
     if (data.rotation != undefined) {
+      if (el.getAttribute("animating") == "true") {
+        return;
+      }
 
-      el.object3D.rotation.set(
-        THREE.Math.degToRad(data.rotation.x),
-        THREE.Math.degToRad(data.rotation.y),
-        THREE.Math.degToRad(data.rotation.z)
-      );
+      // el.object3D.rotation.set(
+      //   THREE.Math.degToRad(data.rotation.x),
+      //   THREE.Math.degToRad(data.rotation.y),
+      //   THREE.Math.degToRad(data.rotation.z)
+      // );
 
-      // var test = {
-      //   y: el.object3D.rotation.y,
-      //   x: el.object3D.rotation.x,
-      //   z: el.object3D.rotation.z
-      // };
+      var test = {
+        x: THREE.Math.radToDeg(el.object3D.rotation.x),
+        y: THREE.Math.radToDeg(el.object3D.rotation.y),
+        z: THREE.Math.radToDeg(el.object3D.rotation.z)
+      };
 
-      // window.anime({
-      //   targets: test,
-      //   x: THREE.Math.degToRad(data.rotation.x),
-      //   y: THREE.Math.degToRad(data.rotation.y),
-      //   z: THREE.Math.degToRad(data.rotation.z),
-      //   duration: 10,
-      //   update: function () {
-      //     el.object3D.position.set(test.x, test.y, test.z);
-      //   }
-      // });
+      window.anime({
+        targets: test,
+        x: data.rotation.x,
+        y: data.rotation.y,
+        z: data.rotation.z,
+        delay: 0,
+        duration: 400,
+        elasticity: 150,
+        begin: function () {
+          el.setAttribute("animating", "true");
+          console.log("starting with test:", test);
+          console.log('starting object3d rotation', el.object3D.rotation.x)
+        },
+        update: function (anim) {
+          // console.log('easing', test)
+          el.object3D.rotation.set(THREE.Math.degToRad(test.x), THREE.Math.degToRad(test.y), THREE.Math.degToRad(test.z));
+        },
+        complete: function () {
+          el.setAttribute("animating", "false");
+          console.log('completed test', test)
+          console.log('completed object3d rotation', el.object3D.rotation.x)
+        },
+      });
     }
   }
 

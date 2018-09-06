@@ -9,6 +9,7 @@ $(function () {
     id: undefined,
     color: undefined
   };
+  var playerData = {}
 
   socket.on('connection-success', function (id, color) {
     avatar.id = id;
@@ -59,6 +60,7 @@ $(function () {
 
   function updatePlayer(id, data) {
     if (document.getElementById(id) === null) {
+      playerData[id] = {};
       var el = document.createElement('a-entity');
       el.setAttribute('id', id);
       document.querySelector('a-scene').appendChild(el);
@@ -68,26 +70,29 @@ $(function () {
       el.setAttribute('material', {
         color: data.color
       });
-      setPosition(el, data);
-      setRotation(el, data);
+      setPosition(el, id, data);
+      setRotation(el, id, data);
     } else {
       var el = document.getElementById(id);
-      setPosition(el, data);
-      setRotation(el, data);
+      setPosition(el, id, data);
+      setRotation(el, id, data);
     }
   }
 
-  function setPosition(el, data) {
+  function setPosition(el, id, data) {
     if (data.position != undefined) {
       el.object3D.position.set(data.position.x, data.position.y, data.position.z);
     }
   }
 
-  function setRotation(el, data) {
+  function setRotation(el, id, data) {
     if (data.rotation != undefined) {
-      if (el.getAttribute("animating") == "true") {
-        return;
+      if (playerData[id].rotationAnimation != undefined) {
+        playerData[id].rotationAnimation.pause();
       }
+      // if (el.getAttribute("animating") == "true") {
+      //   return;
+      // }
 
       var test = {
         x: window.THREE.Math.radToDeg(el.object3D.rotation.x),
@@ -95,16 +100,16 @@ $(function () {
         z: window.THREE.Math.radToDeg(el.object3D.rotation.z)
       };
 
-      window.anime({
+      playerData[id].rotationAnimation = window.anime({
         targets: test,
         x: data.rotation.x,
         y: data.rotation.y,
         z: data.rotation.z,
         delay: 0,
-        duration: 50,
-        elasticity: 50,
+        duration: 300,
+        elasticity: 0,
         begin: function () {
-          el.setAttribute("animating", "true");
+          // el.setAttribute("animating", "true");
           console.log("starting with test:", test);
           console.log('starting object3d rotation', el.object3D.rotation.x)
         },
@@ -113,7 +118,7 @@ $(function () {
           el.object3D.rotation.set(window.THREE.Math.degToRad(test.x), window.THREE.Math.degToRad(test.y), window.THREE.Math.degToRad(test.z));
         },
         complete: function () {
-          el.setAttribute("animating", "false");
+          // el.setAttribute("animating", "false");
           console.log('completed test', test)
           console.log('completed object3d rotation', el.object3D.rotation.x)
         },
@@ -151,9 +156,9 @@ $(function () {
         return
       }
 
-      if (Math.floor(Math.random() * 15) != 1) {
-        return
-      }
+      // if (Math.floor(Math.random() * 5) != 1) {
+      //   return
+      // }
 
       var rotation = this.el.getAttribute('rotation');
       // do nothing if barely rotating

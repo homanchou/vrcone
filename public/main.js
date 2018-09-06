@@ -101,8 +101,8 @@ $(function () {
         y: data.rotation.y,
         z: data.rotation.z,
         delay: 0,
-        duration: 400,
-        elasticity: 150,
+        duration: 50,
+        elasticity: 50,
         begin: function () {
           el.setAttribute("animating", "true");
           console.log("starting with test:", test);

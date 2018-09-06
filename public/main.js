@@ -85,11 +85,29 @@ $(function () {
 
   function setRotation(el, data) {
     if (data.rotation != undefined) {
+
       el.object3D.rotation.set(
         THREE.Math.degToRad(data.rotation.x),
         THREE.Math.degToRad(data.rotation.y),
         THREE.Math.degToRad(data.rotation.z)
       );
+
+      // var test = {
+      //   y: el.object3D.rotation.y,
+      //   x: el.object3D.rotation.x,
+      //   z: el.object3D.rotation.z
+      // };
+
+      // window.anime({
+      //   targets: test,
+      //   x: THREE.Math.degToRad(data.rotation.x),
+      //   y: THREE.Math.degToRad(data.rotation.y),
+      //   z: THREE.Math.degToRad(data.rotation.z),
+      //   duration: 10,
+      //   update: function () {
+      //     el.object3D.position.set(test.x, test.y, test.z);
+      //   }
+      // });
     }
   }
 

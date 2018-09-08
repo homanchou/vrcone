@@ -7,8 +7,8 @@
 		"start": "node index.js"
 	},
 	"dependencies": {
-    "express": "^4.12.4",
-    "socket.io": "*"
+		"express": "^4.12.4",
+		"socket.io": "*"
 	},
 	"keywords": [
 		"node",

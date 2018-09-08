@@ -80,6 +80,8 @@ $(function () {
       var shipRotation = ship.getAttribute('rotation');
       shipRotation.x -= 90;
       ship.setAttribute('rotation', shipRotation);
+      ship.setAttribute('shadow', {});
+
       ship.setAttribute('material', {
         color: data.shipColor
       });
@@ -100,6 +102,7 @@ $(function () {
       var headRotation = head.getAttribute('rotation');
       headRotation.x -= 90;
       head.setAttribute('rotation', headRotation);
+      head.setAttribute('shadow', {})
       head.setAttribute('material', {
         color: data.shipColor
       });

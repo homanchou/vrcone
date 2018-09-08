@@ -74,10 +74,10 @@ $(function () {
         openEnded: false
       });
       // squash cone into a ship
-      shipScale = ship.getAttribute('scale');
+      var shipScale = ship.getAttribute('scale');
       shipScale.z = 0.1;
       ship.setAttribute('scale', shipScale);
-      shipRotation = ship.getAttribute('rotation');
+      var shipRotation = ship.getAttribute('rotation');
       shipRotation.x -= 90;
       ship.setAttribute('rotation', shipRotation);
       ship.setAttribute('material', {
@@ -93,19 +93,19 @@ $(function () {
       playerCam.appendChild(head);
       head.setAttribute('geometry', {
         primitive: 'cone',
-        radiusBottom: 0.8,
+        radiusBottom: 0.5,
         height: 1,
         radiusTop: 0
       });
-      headRotation = head.getAttribute('rotation');
+      var headRotation = head.getAttribute('rotation');
       headRotation.x -= 90;
       head.setAttribute('rotation', headRotation);
       head.setAttribute('material', {
         color: data.shipColor
       });
-      headPosition = head.getAttribute('position');
-      headPosition.y += 1;
-      headPosition.z -= 0.2;
+      var headPosition = head.getAttribute('position');
+      headPosition.y += 0.6;
+      headPosition.z -= 0.3;
       head.setAttribute('position', headPosition);
 
       setPosition(el, data.shipPosition);

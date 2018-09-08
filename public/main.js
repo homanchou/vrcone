@@ -68,13 +68,14 @@ $(function () {
       el.appendChild(ship);
       ship.setAttribute('geometry', {
         primitive: 'cone',
-        radiusBottom: 0.6,
-        radiusTop: 0.2,
+        radiusBottom: 1.5,
+        height: 3,
+        radiusTop: 0,
         openEnded: false
       });
       // squash cone into a ship
       shipScale = ship.getAttribute('scale');
-      shipScale.z = 0.05;
+      shipScale.z = 0.1;
       ship.setAttribute('scale', shipScale);
       shipRotation = ship.getAttribute('rotation');
       shipRotation.x -= 90;
@@ -92,8 +93,8 @@ $(function () {
       playerCam.appendChild(head);
       head.setAttribute('geometry', {
         primitive: 'cone',
-        radiusBottom: 0.25,
-        height: 0.5,
+        radiusBottom: 0.8,
+        height: 1,
         radiusTop: 0
       });
       headRotation = head.getAttribute('rotation');
@@ -103,7 +104,8 @@ $(function () {
         color: data.shipColor
       });
       headPosition = head.getAttribute('position');
-      headPosition.y += 0.5;
+      headPosition.y += 1;
+      headPosition.z -= 0.2;
       head.setAttribute('position', headPosition);
 
       setPosition(el, data.shipPosition);

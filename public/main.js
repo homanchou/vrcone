@@ -4,17 +4,14 @@ $(function () {
 
   // makes connection
   var socket = io();
-  var avatar = {
-    joined: false,
-    id: undefined,
-    color: undefined
+  var ship = {
+    joined: false
   };
   var playerData = {}
 
-  socket.on('connection-success', function (id, color) {
-    avatar.id = id;
-    avatar.color = color;
-    console.log('connected', avatar);
+  socket.on('connection-success', function (id) {
+    ship.id = id;
+    document.getElementById('ship').setAttribute('init-ship', {});
   });
 
   // Whenever the server emits 'consolelog', update the console.log
@@ -39,19 +36,20 @@ $(function () {
 
   socket.on('join-successful', function (data) {
     console.log('join success', data);
-    avatar.joined = true;
+    ship.joined = true;
     // gets hash of all players, draw them all
     $.each(data, function (key, value) {
-      if (key == avatar.id) {
+      if (key == ship.id) {
         return
       }
       updatePlayer(key, value);
     });
+    document.getElementById('head').setAttribute('head-rotation-reader', {});
   });
 
   function removePlayer(id) {
     if (document.getElementById(id) === null) {
-      return
+      return;
     } else {
       var el = document.getElementById(id);
       el.parentNode.removeChild(el);
@@ -60,70 +58,111 @@ $(function () {
 
   function updatePlayer(id, data) {
     if (document.getElementById(id) === null) {
-      playerData[id] = {};
+      // el holds player rotation and position
       var el = document.createElement('a-entity');
       el.setAttribute('id', id);
       document.querySelector('a-scene').appendChild(el);
-      el.setAttribute('geometry', {
-        primitive: 'box'
+      // nest a ship so we see players ship
+      var ship = document.createElement('a-entity');
+      ship.setAttribute('id', 'ship-' + id);
+      el.appendChild(ship);
+      ship.setAttribute('geometry', {
+        primitive: 'cone',
+        radiusBottom: 0.6,
+        radiusTop: 0.2,
+        openEnded: false
       });
-      el.setAttribute('material', {
-        color: data.color
+      // squash cone into a ship
+      shipScale = ship.getAttribute('scale');
+      shipScale.z = 0.05;
+      ship.setAttribute('scale', shipScale);
+      shipRotation = ship.getAttribute('rotation');
+      shipRotation.x -= 90;
+      ship.setAttribute('rotation', shipRotation);
+      ship.setAttribute('material', {
+        color: data.shipColor
       });
-      setPosition(el, id, data);
-      setRotation(el, id, data);
+      // nest a person on the ship so we can move head relative to ship
+      // playerCam will be positioned by socket updates
+      var playerCam = document.createElement('a-entity');
+      playerCam.setAttribute('id', 'player-cam-' + id);
+      el.appendChild(playerCam);
+      // head will show the orientation of the camera
+      var head = document.createElement('a-entity');
+      playerCam.appendChild(head);
+      head.setAttribute('geometry', {
+        primitive: 'cone',
+        radiusBottom: 0.25,
+        height: 0.5,
+        radiusTop: 0
+      });
+      headRotation = head.getAttribute('rotation');
+      headRotation.x -= 90;
+      head.setAttribute('rotation', headRotation);
+      head.setAttribute('material', {
+        color: data.shipColor
+      });
+      headPosition = head.getAttribute('position');
+      headPosition.y += 0.5;
+      head.setAttribute('position', headPosition);
+
+      setPosition(el, data.shipPosition);
+      setRotation(el, data.shipRotation);
+      setRotation(playerCam, data.headRotation);
     } else {
       var el = document.getElementById(id);
-      setPosition(el, id, data);
-      setRotation(el, id, data);
+      var playerCam = document.getElementById('player-cam-' + id)
+      setPosition(el, data.shipPosition);
+      setRotation(el, data.shipRotation);
+      setRotation(playerCam, data.headRotation);
     }
   }
 
-  function setPosition(el, id, data) {
-    if (data.position != undefined) {
-      el.object3D.position.set(data.position.x, data.position.y, data.position.z);
+  function setPosition(el, position) {
+    if (position != undefined) {
+      el.object3D.position.set(position.x, position.y, position.z);
     }
   }
 
-  function setRotation(el, id, data) {
-    if (data.rotation != undefined) {
-      if (playerData[id].rotationAnimation != undefined) {
-        playerData[id].rotationAnimation.pause();
-      }
-      // if (el.getAttribute("animating") == "true") {
-      //   return;
-      // }
-
-      var test = {
-        x: window.THREE.Math.radToDeg(el.object3D.rotation.x),
-        y: window.THREE.Math.radToDeg(el.object3D.rotation.y),
-        z: window.THREE.Math.radToDeg(el.object3D.rotation.z)
-      };
-
-      playerData[id].rotationAnimation = window.anime({
-        targets: test,
-        x: data.rotation.x,
-        y: data.rotation.y,
-        z: data.rotation.z,
-        delay: 0,
-        duration: 300,
-        elasticity: 0,
-        begin: function () {
-          // el.setAttribute("animating", "true");
-          console.log("starting with test:", test);
-          console.log('starting object3d rotation', el.object3D.rotation.x)
-        },
-        update: function (anim) {
-          // console.log('easing', test)
-          el.object3D.rotation.set(window.THREE.Math.degToRad(test.x), window.THREE.Math.degToRad(test.y), window.THREE.Math.degToRad(test.z));
-        },
-        complete: function () {
-          // el.setAttribute("animating", "false");
-          console.log('completed test', test)
-          console.log('completed object3d rotation', el.object3D.rotation.x)
-        },
-      });
+  function setRotation(el, rotation) {
+    console.log('el', el)
+    if (rotation === undefined) {
+      return;
     }
+    if (playerData['rot' + el.id] != undefined) {
+      playerData['rot' + el.id].pause();
+    }
+
+    var test = {
+      x: window.THREE.Math.radToDeg(el.object3D.rotation.x),
+      y: window.THREE.Math.radToDeg(el.object3D.rotation.y),
+      z: window.THREE.Math.radToDeg(el.object3D.rotation.z)
+    };
+
+    playerData['rot' + el.id] = window.anime({
+      targets: test,
+      x: rotation.x,
+      y: rotation.y,
+      z: rotation.z,
+      delay: 0,
+      duration: 300,
+      elasticity: 0,
+      begin: function () {
+        // el.setAttribute("animating", "true");
+        console.log("starting with test:", test);
+        console.log('starting object3d rotation', el.object3D.rotation.x)
+      },
+      update: function (anim) {
+        // console.log('easing', test)
+        el.object3D.rotation.set(window.THREE.Math.degToRad(test.x), window.THREE.Math.degToRad(test.y), window.THREE.Math.degToRad(test.z));
+      },
+      complete: function () {
+        // el.setAttribute("animating", "false");
+        console.log('completed test', test)
+        console.log('completed object3d rotation', el.object3D.rotation.x)
+      },
+    });
+
   }
 
   socket.on('player-joined', function (id, data) {
@@ -145,60 +184,68 @@ $(function () {
 
   //aframe component
 
-  var prevX = 0;
-  var prevY = 0;
-  var prevZ = 0;
-
-  window.AFRAME.registerComponent('rotation-reader', {
+  window.AFRAME.registerComponent('head-rotation-reader', {
+    init: function () {
+      this.prevX = 0;
+      this.prevY = 0;
+      this.prevZ = 0;
+    },
     tick: function () {
-
-      if (!avatar.joined) {
-        return
-      }
-
-      // if (Math.floor(Math.random() * 5) != 1) {
-      //   return
-      // }
 
       var rotation = this.el.getAttribute('rotation');
       // do nothing if barely rotating
-      if (Math.abs(prevX - rotation.x) < 3 && Math.abs(prevY - rotation.y) < 3 && Math.abs(prevZ - rotation.z) < 3) {
+      if (Math.abs(this.prevX - rotation.x) < 3 && Math.abs(this.prevY - rotation.y) < 3 && Math.abs(this.prevZ - rotation.z) < 3) {
         return
       }
       var data = {
-        rotation: rotation
+        headRotation: rotation
       }
-      console.log(avatar.id, "rotating", data);
+      console.log(ship.id, "rotating", data);
       socket.emit('headset-rotating', data);
-      prevX = rotation.x;
-      prevY = rotation.y;
-      prevZ = rotation.z;
+      this.prevX = rotation.x;
+      this.prevY = rotation.y;
+      this.prevZ = rotation.z;
 
     }
   });
 
 
 
-  window.AFRAME.registerComponent('init-avatar', {
+  window.AFRAME.registerComponent('init-ship', {
 
     init: function () {
-      var y = Math.floor(Math.random() * 360);
-      var x = Math.random() * 10 - 5;
-      var z = Math.random() * 10 - 5;
-
+      var color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+      // var rotation = {
+      //   x: 0,
+      //   y: Math.floor(Math.random() * 360),
+      //   z: 0
+      // };
+      // var position = {
+      //   x: (Math.random() * 10 - 5),
+      //   y: 1.6,
+      //   z: (Math.random() * 10 - 5)
+      // };
+      // this.el.object3D.rotation.set(0, window.THREE.degToRad(rotation.y), 0);
+      // this.el.object3D.position.set(position.x, position.y, position.z);
       var rotation = this.el.getAttribute('rotation');
-      rotation.y += y;
+      rotation.y += Math.floor(Math.random() * 360);
       this.el.setAttribute('rotation', rotation)
       var position = this.el.getAttribute('position');
-      position.x += x;
-      position.z += z;
-      position.y += 1.6;
+      position.x += (Math.random() * 10 - 5);
+      position.z += (Math.random() * 10 - 5);
+      position.y += 0; //1.6;
       this.el.setAttribute('position', position)
-      // avatarID = Math.random().toString(32).substr(2,9);
       var data = {
-        rotation: rotation,
-        position: position
+        shipColor: color,
+        shipRotation: rotation,
+        shipPosition: position,
+        headRotation: {
+          x: 0,
+          y: 0,
+          z: 0
+        }
       };
+      console.log('in init sending', data);
       socket.emit('player-joining', data);
     }
   });

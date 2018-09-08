@@ -48,14 +48,16 @@
     <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4" shadow></a-plane>
 
     <a-entity id="ship">
-      <a-plane position="0 0.5 -4" rotation="-90 0 0" width="1" height="1" color="#ff0000" shadow>
+      <a-plane position="0 0.5 -4" rotation="-90 0 0" width="1" height="1" color="#ff0000" boost-forward shadow>
 
         <a-animation begin="mouseenter" attribute="scale" from="1 1 1" to="2 2 2"></a-animation>
 
         <a-animation begin="mouseleave" attribute="scale" from="2 2 2" to="1 1 1"></a-animation>
       </a-plane>
       <a-camera id="head">
-        <a-cursor></a-cursor>
+        <a-entity cursor="fuse: true; fuseTimeout: 500" position="0 0 -1" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+          material="color: black; shader: flat">
+        </a-entity>
       </a-camera>
     </a-entity>
 

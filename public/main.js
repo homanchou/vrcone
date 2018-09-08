@@ -255,4 +255,44 @@ $(function () {
     }
   });
 
+  window.AFRAME.registerComponent('boost-forward', {
+    init: function () {
+      this.el.addEventListener('click', function (evt) {
+        var ship = document.getElementById('ship');
+        var startPos = new window.THREE.Vector3(ship.object3D.position.x, ship.object3D.position.y, ship.object3D.position.z);
+        var direction = ship.object3D.getWorldDirection(); //new window.THREE.Vector3(ship.object3D.rotation.x, ship.object3D.rotation.y, ship.object3D.rotation.z);
+        console.log('direction of the ship', direction)
+        var distance = -5;
+        var newPos = new THREE.Vector3();
+        newPos.addVectors(startPos, direction.multiplyScalar(distance));
+
+        var test = {
+          x: startPos.x,
+          y: startPos.y,
+          z: startPos.z
+        }
+
+        window.anime({
+          targets: test,
+          x: newPos.x,
+          y: newPos.y,
+          z: newPos.z,
+          delay: 0,
+          duration: 1000,
+          elasticity: 10,
+          update: function (anim) {
+            // console.log('easing', test)
+            ship.object3D.position.set(test.x, test.y, test.z);
+          }
+        });
+
+
+        // var shipPos = ship.getAttribute('position');
+        // shipPos.z -= 1;
+        // ship.setAttribute('position', shipPos);
+        console.log("shipZ")
+      });
+    }
+  });
+
 });

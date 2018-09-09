@@ -30,7 +30,7 @@
     <a-ocean width="100" depth="100" density="50"></a-ocean>
     <a-sky src="#sky" rotation="0 -90 0"></a-sky>
 
-    <a-entity scale="2 2 2" geometry="primitive: torusKnot" position="0 6 10" material="color: magenta; metalness:1; roughness: 0.1; sphericalEnvMap: #sky;">
+    <a-entity scale="1.5 1.5 1.5" geometry="primitive: torusKnot" position="0 6 10" material="color: magenta; metalness:1; roughness: 0.1; sphericalEnvMap: #sky;">
       <a-animation easing="linear" attribute="rotation" dur="10000" to="0 0 360" repeat="indefinite"></a-animation>
     </a-entity>
 
@@ -40,22 +40,31 @@
       <a-animation begin="mouseenter" attribute="scale" from="1 1 1" to="0.9 1.5 2"></a-animation>
     </a-box>
     <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E" shadow>
-      <a-animation begin="mouseenter" attribute="scale" from="1 1 1" to="2 2 2"></a-animation>
+      <a-animation begin="mouseenter" attribute="scale" from="1 1 1" to="1.5 1.5 1.5"></a-animation>
 
-      <a-animation begin="mouseleave" attribute="scale" from="2 2 2" to="1 1 1"></a-animation>
+      <a-animation begin="mouseleave" attribute="scale" from="1.5 1.5 1.5" to="1 1 1"></a-animation>
     </a-sphere>
     <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D" shadow></a-cylinder>
     <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4" shadow></a-plane>
 
     <a-entity id="ship">
       <a-plane position="0 0.5 -4" rotation="-90 0 0" width="1" height="1" color="#ff0000" boost-forward shadow>
-
-        <a-animation begin="mouseenter" attribute="scale" from="1 1 1" to="2 2 2"></a-animation>
-
-        <a-animation begin="mouseleave" attribute="scale" from="2 2 2" to="1 1 1"></a-animation>
+        <a-animation begin="mouseenter" dur="200" attribute="scale" from="1 1 1" to="1.5 1.5 1.5"></a-animation>
+        <a-animation begin="mouseleave" dur="200" attribute="scale" from="1.5 1.5 1.5" to="1 1 1"></a-animation>
       </a-plane>
+      <a-plane position="2 0.5 -3" rotation="-90 0 0" width="1" height="1" color="#f0ff00" turn-ship="direction: right"
+        shadow>
+        <a-animation begin="mouseenter" dur="200" attribute="scale" from="1 1 1" to="1.5 1.5 1.5"></a-animation>
+        <a-animation begin="mouseleave" dur="200" attribute="scale" from="1.5 1.5 1.5" to="1 1 1"></a-animation>
+      </a-plane>
+      <a-plane position="-2 0.5 -3" rotation="-90 0 0" width="1" height="1" color="#f0ff00" turn-ship="direction: left"
+        shadow>
+        <a-animation begin="mouseenter" dur="200" attribute="scale" from="1 1 1" to="1.5 1.5 1.5"></a-animation>
+        <a-animation begin="mouseleave" dur="200" attribute="scale" from="1.5 1.5 1.5" to="1 1 1"></a-animation>
+      </a-plane>
+
       <a-camera id="head">
-        <a-entity cursor="fuse: true; fuseTimeout: 500" position="0 0 -1" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+        <a-entity cursor="fuse: true; fuseTimeout: 700" position="0 0 -1" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
           material="color: black; shader: flat">
         </a-entity>
       </a-camera>

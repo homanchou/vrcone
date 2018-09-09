@@ -54,5 +54,11 @@ io.on('connection', function (socket) {
     socket.broadcast.emit('headset-rotated', socket.avatarID, newData);
   });
 
+  socket.on('ship-moving', function (data) {
+    newData = Object.assign(playerData[socket.avatarID], data);
+    playerData[socket.avatarID] = newData;
+    socket.broadcast.emit('ship-moved', socket.avatarID, newData);
+  });
+
 
 });

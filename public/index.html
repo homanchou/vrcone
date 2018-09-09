@@ -43,19 +43,20 @@
     <a-cylinder position="11 0.75 10" radius="0.5" height="1.5" color="#FFC65D" shadow></a-cylinder>
 
     <a-entity id="ship">
-      <a-plane position="0 1 -4" rotation="-90 0 0" width="0.5" height="0.8" color="#ff0000" boost-forward shadow>
-        <a-animation begin="mouseenter" dur="200" attribute="scale" from="1 1 1" to="1 2 1"></a-animation>
-        <a-animation begin="mouseleave" dur="200" attribute="scale" from="1.5 1 1.5" to="1 1 1"></a-animation>
+      <a-plane position="0 1.4 -4" rotation="0 0 0" width="0.5" height="0.5" opacity="0.5" color="#ff0f00"
+        boost-forward shadow>
+        <a-animation begin="mouseenter" dur="200" attribute="rotation" from="0 0 0" to="45 0 0"></a-animation>
+        <a-animation begin="mouseleave" dur="200" attribute="rotation" from="45 0 0" to="0 0 0"></a-animation>
       </a-plane>
-      <a-plane position="0.5 1 -3.5" rotation="-90 0 0" width="0.4" height="0.5" color="#f0ff00" turn-ship="direction: right"
+      <a-plane position="0.6 0.8 -4" rotation="0 0 0" width="0.5" height="0.5" opacity="0.5" color="#f0ff00" turn-ship="direction: right"
         shadow>
-        <a-animation begin="mouseenter" dur="200" attribute="scale" from="1 1 1" to="1.3 1 1"></a-animation>
-        <a-animation begin="mouseleave" dur="200" attribute="scale" from="1 1.2 1" to="1 1 1"></a-animation>
+        <a-animation begin="mouseenter" dur="200" attribute="rotation" from="0 0 0" to="0 -45 0"></a-animation>
+        <a-animation begin="mouseleave" dur="200" attribute="rotation" from="0 -45 0" to="0 0 0"></a-animation>
       </a-plane>
-      <a-plane position="-0.5 1 -3.5" rotation="-90 0 0" width="0.4" height="0.5" color="#f0ff00" turn-ship="direction: left"
+      <a-plane position="-0.6 0.8 -4" rotation="0 0 0" width="0.5" height="0.5" opacity="0.5" color="#f0ff00" turn-ship="direction: left"
         shadow>
-        <a-animation begin="mouseenter" dur="200" attribute="scale" from="1 1 1" to="1.3 1 1"></a-animation>
-        <a-animation begin="mouseleave" dur="200" attribute="scale" from="1 1.2 1" to="1 1 1"></a-animation>
+        <a-animation begin="mouseenter" dur="200" attribute="rotation" from="0 0 0" to="0 45 0"></a-animation>
+        <a-animation begin="mouseleave" dur="200" attribute="rotation" from="0 45 0" to="0 0 0"></a-animation>
       </a-plane>
 
       <a-camera id="head">

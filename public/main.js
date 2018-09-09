@@ -277,7 +277,7 @@ $(function () {
         default: 'left'
       },
       degrees: {
-        default: 60
+        default: 45
       }
     },
     init: function () {

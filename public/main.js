@@ -80,6 +80,8 @@ $(function () {
       var shipRotation = ship.getAttribute('rotation');
       shipRotation.x -= 90;
       ship.setAttribute('rotation', shipRotation);
+      ship.setAttribute('shadow', {});
+
       ship.setAttribute('material', {
         color: data.shipColor
       });
@@ -100,6 +102,7 @@ $(function () {
       var headRotation = head.getAttribute('rotation');
       headRotation.x -= 90;
       head.setAttribute('rotation', headRotation);
+      head.setAttribute('shadow', {})
       head.setAttribute('material', {
         color: data.shipColor
       });
@@ -108,26 +111,47 @@ $(function () {
       headPosition.z -= 0.3;
       head.setAttribute('position', headPosition);
 
-      setPosition(el, data.shipPosition);
-      setRotation(el, data.shipRotation);
-      setRotation(playerCam, data.headRotation);
+      setPosition(el, data.shipPosition, 0, 0);
+      setRotation(el, data.shipRotation, 0, 0);
+      setRotation(playerCam, data.headRotation, 0, 0);
     } else {
       var el = document.getElementById(id);
       var playerCam = document.getElementById('player-cam-' + id)
-      setPosition(el, data.shipPosition);
-      setRotation(el, data.shipRotation);
-      setRotation(playerCam, data.headRotation);
+      setPosition(el, data.shipPosition, 1500, 10);
+      setRotation(el, data.shipRotation, 300, 3);
+      setRotation(playerCam, data.headRotation, 300, 0);
     }
   }
 
-  function setPosition(el, position) {
-    if (position != undefined) {
-      el.object3D.position.set(position.x, position.y, position.z);
+  function setPosition(el, position, duration, elasticity) {
+    if (position === undefined) {
+      return;
     }
+    if (playerData['pos' + el.id] != undefined) {
+      playerData['pos' + el.id].pause();
+    }
+    var startPos = el.object3D.position;
+    var test = {
+      x: startPos.x,
+      y: startPos.y,
+      z: startPos.z
+    };
+    playerData['pos' + el.id] = window.anime({
+      targets: test,
+      x: position.x,
+      y: position.y,
+      z: position.z,
+      delay: 0,
+      duration: duration,
+      elasticity: elasticity,
+      update: function (anim) {
+        // console.log('easing', test)
+        el.object3D.position.set(test.x, test.y, test.z);
+      }
+    });
   }
 
-  function setRotation(el, rotation) {
-    console.log('el', el)
+  function setRotation(el, rotation, duration, elasticity) {
     if (rotation === undefined) {
       return;
     }
@@ -147,22 +171,11 @@ $(function () {
       y: rotation.y,
       z: rotation.z,
       delay: 0,
-      duration: 300,
-      elasticity: 0,
-      begin: function () {
-        // el.setAttribute("animating", "true");
-        console.log("starting with test:", test);
-        console.log('starting object3d rotation', el.object3D.rotation.x)
-      },
+      duration: duration,
+      elasticity: elasticity,
       update: function (anim) {
-        // console.log('easing', test)
         el.object3D.rotation.set(window.THREE.Math.degToRad(test.x), window.THREE.Math.degToRad(test.y), window.THREE.Math.degToRad(test.z));
-      },
-      complete: function () {
-        // el.setAttribute("animating", "false");
-        console.log('completed test', test)
-        console.log('completed object3d rotation', el.object3D.rotation.x)
-      },
+      }
     });
 
   }
@@ -217,18 +230,6 @@ $(function () {
 
     init: function () {
       var color = '#' + Math.floor(Math.random() * 16777215).toString(16);
-      // var rotation = {
-      //   x: 0,
-      //   y: Math.floor(Math.random() * 360),
-      //   z: 0
-      // };
-      // var position = {
-      //   x: (Math.random() * 10 - 5),
-      //   y: 1.6,
-      //   z: (Math.random() * 10 - 5)
-      // };
-      // this.el.object3D.rotation.set(0, window.THREE.degToRad(rotation.y), 0);
-      // this.el.object3D.position.set(position.x, position.y, position.z);
       var rotation = this.el.getAttribute('rotation');
       rotation.y += Math.floor(Math.random() * 360);
       this.el.setAttribute('rotation', rotation)
@@ -247,8 +248,54 @@ $(function () {
           z: 0
         }
       };
-      console.log('in init sending', data);
       socket.emit('player-joining', data);
+    }
+  });
+
+  window.AFRAME.registerComponent('boost-forward', {
+    init: function () {
+      this.el.addEventListener('click', function (evt) {
+        var ship = document.getElementById('ship');
+        var startPos = new window.THREE.Vector3(ship.object3D.position.x, ship.object3D.position.y, ship.object3D.position.z);
+        var direction = ship.object3D.getWorldDirection(); //new window.THREE.Vector3(ship.object3D.rotation.x, ship.object3D.rotation.y, ship.object3D.rotation.z);
+        console.log('direction of the ship', direction)
+        var distance = -5;
+        var newPos = new THREE.Vector3();
+        newPos.addVectors(startPos, direction.multiplyScalar(distance));
+        socket.emit('ship-moving', {
+          shipPosition: newPos
+        });
+        setPosition(ship, newPos, 1500, 3);
+      });
+    }
+  });
+
+
+  window.AFRAME.registerComponent('turn-ship', {
+    schema: {
+      direction: {
+        default: 'left'
+      },
+      degrees: {
+        default: 45
+      }
+    },
+    init: function () {
+      var changeBy = (this.data.direction === 'left') ? this.data.degrees : -this.data.degrees;
+      this.el.addEventListener('click', function (evt) {
+        var ship = document.getElementById('ship');
+        var startRot = ship.object3D.rotation;
+        var newRot = {
+          x: window.THREE.Math.radToDeg(startRot.x),
+          y: window.THREE.Math.radToDeg(startRot.y) + changeBy,
+          z: window.THREE.Math.radToDeg(startRot.z)
+        }
+
+        socket.emit('ship-moving', {
+          shipRotation: newRot
+        });
+        setRotation(ship, newRot, 1500, 3);
+      });
     }
   });
 
